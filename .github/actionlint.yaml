@@ -1,0 +1,8 @@
+# actionlint's known-runner-label list lags behind the runners that GitHub
+# actually publishes. ubuntu-26.04 has been live since 2026-06-04
+# (actions/runner-images release ubuntu26/20260604.34) but isn't yet in
+# actionlint's built-in label set. Declaring it here silences the
+# false-positive `runner-label` warning without disabling the check.
+self-hosted-runner:
+  labels:
+    - ubuntu-26.04

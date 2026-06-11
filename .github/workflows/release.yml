@@ -14,17 +14,102 @@ permissions:
   contents: write
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ inputs.tag || github.ref }}
   cancel-in-progress: false
 
 jobs:
+  resolve:
+    name: resolve tag → sha
+    runs-on: ubuntu-26.04
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+      sha: ${{ steps.resolve.outputs.sha }}
+      version: ${{ steps.resolve.outputs.version }}
+      prerelease: ${{ steps.resolve.outputs.prerelease }}
+    steps:
+      - id: resolve
+        env:
+          # On tag push, github.ref_name is the tag (e.g. "v0.1.0").
+          # On workflow_dispatch, github.ref_name is the source branch — so prefer inputs.tag.
+          REF_TAG: ${{ inputs.tag || github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag="$REF_TAG"
+
+          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.-]+)?$ ]]; then
+            echo "::error::tag '$tag' is not a valid semver tag (expected vX.Y.Z[-suffix])"
+            exit 1
+          fi
+          version="${tag#v}"
+
+          # Resolve the tag ref. Annotated tags point at a tag object; deref to the commit.
+          ref_json=$(gh api "repos/${REPO}/git/refs/tags/${tag}")
+          obj_sha=$(jq -r '.object.sha' <<<"$ref_json")
+          obj_type=$(jq -r '.object.type' <<<"$ref_json")
+          if [[ "$obj_type" == "tag" ]]; then
+            sha=$(gh api "repos/${REPO}/git/tags/${obj_sha}" --jq '.object.sha')
+          else
+            sha="$obj_sha"
+          fi
+
+          if [[ -z "$sha" || "$sha" == "null" ]]; then
+            echo "::error::could not resolve tag '$tag' to a commit SHA"
+            exit 1
+          fi
+
+          # Pre-1.0 or any -suffix → prerelease.
+          prerelease=false
+          if [[ "$version" =~ ^0\. || "$version" =~ - ]]; then
+            prerelease=true
+          fi
+
+          {
+            echo "tag=$tag"
+            echo "sha=$sha"
+            echo "version=$version"
+            echo "prerelease=$prerelease"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Resolved $tag → $sha (version=$version, prerelease=$prerelease)"
+
   build-deb:
     name: build .deb (amd64)
-    runs-on: ubuntu-24.04
+    needs: resolve
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
-          ref: ${{ inputs.tag || github.ref }}
+          ref: ${{ needs.resolve.outputs.sha }}
+
+      - name: Verify version sync (tag vs package.json / Cargo.toml / tauri.conf.json)
+        env:
+          EXPECTED: ${{ needs.resolve.outputs.version }}
+        run: |
+          set -euo pipefail
+          fail=0
+
+          pkg=$(jq -r .version package.json)
+          if [[ "$pkg" != "$EXPECTED" ]]; then
+            echo "::error file=package.json::version=$pkg, expected=$EXPECTED"
+            fail=1
+          fi
+
+          tauri=$(jq -r .version src-tauri/tauri.conf.json)
+          if [[ "$tauri" != "$EXPECTED" ]]; then
+            echo "::error file=src-tauri/tauri.conf.json::version=$tauri, expected=$EXPECTED"
+            fail=1
+          fi
+
+          cargo=$(grep -m1 -E '^version[[:space:]]*=' src-tauri/Cargo.toml \
+            | sed -E 's/^version[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/')
+          if [[ "$cargo" != "$EXPECTED" ]]; then
+            echo "::error file=src-tauri/Cargo.toml::version=$cargo, expected=$EXPECTED"
+            fail=1
+          fi
+
+          [[ $fail -eq 0 ]]
 
       - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
         with:
@@ -57,16 +142,64 @@ jobs:
 
       - run: pnpm tauri build --bundles deb
 
-      - name: Upload .deb
+      - name: Upload .deb artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: cronaut-deb-amd64
           path: src-tauri/target/release/bundle/deb/*.deb
           if-no-files-found: error
 
-      - name: Attach to release
-        if: startsWith(github.ref, 'refs/tags/')
+  publish:
+    name: publish release
+    needs: [resolve, build-deb]
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          ref: ${{ needs.resolve.outputs.sha }}
+
+      - name: Download .deb artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: cronaut-deb-amd64
+          path: dist-deb
+
+      - name: Extract release notes from CHANGELOG.md
+        id: notes
+        env:
+          VERSION: ${{ needs.resolve.outputs.version }}
+        run: |
+          set -euo pipefail
+          notes_file="release-notes.md"
+
+          # Pull the section between "## [VERSION]" (with optional " - YYYY-MM-DD")
+          # and the next "## [" header. Strip leading/trailing blank lines.
+          awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" {flag=1; next}
+            flag && /^## \[/ {flag=0}
+            flag {print}
+          ' CHANGELOG.md \
+            | awk 'NF {p=1} p' \
+            | tac | awk 'NF {p=1} p' | tac \
+            > "$notes_file"
+
+          if [[ -s "$notes_file" ]]; then
+            echo "Found CHANGELOG section for $VERSION ($(wc -l <"$notes_file") lines)"
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::no CHANGELOG section for $VERSION; falling back to auto-generated notes"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "file=$notes_file" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
-          files: src-tauri/target/release/bundle/deb/*.deb
-          generate_release_notes: true
+          tag_name: ${{ needs.resolve.outputs.tag }}
+          target_commitish: ${{ needs.resolve.outputs.sha }}
+          name: ${{ needs.resolve.outputs.tag }}
+          body_path: ${{ steps.notes.outputs.file }}
+          generate_release_notes: ${{ steps.notes.outputs.found != 'true' }}
+          prerelease: ${{ needs.resolve.outputs.prerelease }}
+          files: dist-deb/*.deb
+          fail_on_unmatched_files: true
