@@ -3,9 +3,8 @@
 //! Sources:
 //!   - systemd --user units    → `journalctl --user -u <unit>`
 //!   - user cron               → `journalctl --user-unit=cron* -t CRON`
-//!                               (best-effort; what's available depends on
-//!                                whether cron is configured to log via
-//!                                syslog/journald on this distro)
+//!     (best-effort; what's available depends on whether cron is
+//!     configured to log via syslog/journald on this distro)
 //!
 //! Two modes:
 //!   - one-shot fetch (snapshot)      → `fetch_logs`

@@ -27,7 +27,9 @@ export function LogsPage() {
   const unsubRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    listTimers().then(setTimers).catch((e) => setError(String(e)));
+    listTimers()
+      .then(setTimers)
+      .catch((e) => setError(String(e)));
   }, []);
 
   function buildSource(): LogSource {
@@ -100,7 +102,11 @@ export function LogsPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Logs</h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">
-            Live or snapshot view from <code className="text-xs bg-[var(--surface-muted)] px-1.5 py-0.5 rounded">journalctl --user</code>.
+            Live or snapshot view from{" "}
+            <code className="text-xs bg-[var(--surface-muted)] px-1.5 py-0.5 rounded">
+              journalctl --user
+            </code>
+            .
           </p>
         </div>
       </header>
@@ -145,7 +151,7 @@ export function LogsPage() {
       <Card className="flex-1 min-h-0 overflow-hidden">
         <CardContent className="p-0 h-full">
           <pre className="h-full overflow-auto p-4 text-xs leading-relaxed font-mono whitespace-pre-wrap text-[var(--text-primary)]">
-{lines.length === 0
+            {lines.length === 0
               ? "(no log lines yet — pick a source and click Snapshot, or toggle Follow)"
               : lines.join("\n")}
           </pre>

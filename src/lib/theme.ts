@@ -1,14 +1,7 @@
 import { LazyStore } from "@tauri-apps/plugin-store";
 
 export type ThemeMode = "system" | "light" | "dark";
-export type Accent =
-  | "indigo"
-  | "violet"
-  | "emerald"
-  | "amber"
-  | "rose"
-  | "cyan"
-  | "slate";
+export type Accent = "indigo" | "violet" | "emerald" | "amber" | "rose" | "cyan" | "slate";
 
 export const STORE_FILE = "settings.json";
 

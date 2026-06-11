@@ -83,8 +83,7 @@ export interface CronEntrySpec {
 }
 
 export const listCrontab = () => invoke<CronLine[]>("list_crontab");
-export const addCrontabEntry = (spec: CronEntrySpec) =>
-  invoke<void>("add_crontab_entry", { spec });
+export const addCrontabEntry = (spec: CronEntrySpec) => invoke<void>("add_crontab_entry", { spec });
 export const updateCrontabEntry = (lineNumber: number, spec: CronEntrySpec) =>
   invoke<void>("update_crontab_entry", { lineNumber, spec });
 export const toggleCrontabEntry = (lineNumber: number, enabled: boolean) =>
@@ -96,9 +95,7 @@ export const validateCronExpression = (expr: string) =>
 
 // ---- Logs -----------------------------------------------------------------
 
-export type LogSource =
-  | { kind: "unit"; unit: string }
-  | { kind: "user_cron" };
+export type LogSource = { kind: "unit"; unit: string } | { kind: "user_cron" };
 
 export interface FetchSpec {
   source: LogSource;

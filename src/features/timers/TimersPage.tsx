@@ -53,7 +53,12 @@ export function TimersPage() {
   }
 
   async function onRemove(t: Timer) {
-    if (!confirm(`Remove timer "${t.name}"?\n\nBoth ${t.name}.timer and ${t.name}.service will be deleted.`)) return;
+    if (
+      !confirm(
+        `Remove timer "${t.name}"?\n\nBoth ${t.name}.timer and ${t.name}.service will be deleted.`,
+      )
+    )
+      return;
     try {
       await removeTimer(t.name);
       await refresh();
@@ -68,11 +73,21 @@ export function TimersPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Systemd Timers</h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">
-            Manage <code className="text-xs bg-[var(--surface-muted)] px-1.5 py-0.5 rounded">systemctl --user</code> timers.
+            Manage{" "}
+            <code className="text-xs bg-[var(--surface-muted)] px-1.5 py-0.5 rounded">
+              systemctl --user
+            </code>{" "}
+            timers.
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" size="icon" onClick={refresh} disabled={loading} aria-label="Refresh">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={refresh}
+            disabled={loading}
+            aria-label="Refresh"
+          >
             <RefreshCw className={loading ? "animate-spin h-4 w-4" : "h-4 w-4"} />
           </Button>
           <Button variant="primary" disabled>

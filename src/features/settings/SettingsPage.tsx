@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 import { LazyStore } from "@tauri-apps/plugin-store";
 import { desktopReport, type DesktopReport } from "@/lib/api";
-import {
-  setTheme,
-  setAccent,
-  type ThemeMode,
-  type Accent,
-  STORE_FILE,
-} from "@/lib/theme";
+import { setTheme, setAccent, type ThemeMode, type Accent, STORE_FILE } from "@/lib/theme";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Switch } from "@/components/ui/Switch";
 import { Label } from "@/components/ui/Input";
@@ -47,7 +41,9 @@ export function SettingsPage() {
       setStartMinimized(((await s.get<boolean>("start_minimized")) ?? false) as boolean);
       setNotify(((await s.get<boolean>("notify_on_run")) ?? false) as boolean);
     })();
-    desktopReport().then(setReport).catch(() => {});
+    desktopReport()
+      .then(setReport)
+      .catch(() => {});
   }, []);
 
   async function persist<T>(key: string, value: T) {
@@ -61,7 +57,11 @@ export function SettingsPage() {
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
         <p className="text-sm text-[var(--text-muted)] mt-1">
-          All settings are stored locally in <code className="text-xs bg-[var(--surface-muted)] px-1.5 py-0.5 rounded">~/.config/com.alienresidents.cronaut/{STORE_FILE}</code>.
+          All settings are stored locally in{" "}
+          <code className="text-xs bg-[var(--surface-muted)] px-1.5 py-0.5 rounded">
+            ~/.config/com.alienresidents.cronaut/{STORE_FILE}
+          </code>
+          .
         </p>
       </header>
 
@@ -137,10 +137,7 @@ export function SettingsPage() {
                   ["quit", "Quit the app"],
                 ] as [CloseAction, string][]
               ).map(([id, label]) => (
-                <label
-                  key={id}
-                  className="flex items-center gap-2 text-sm cursor-pointer"
-                >
+                <label key={id} className="flex items-center gap-2 text-sm cursor-pointer">
                   <input
                     type="radio"
                     name="closeAction"

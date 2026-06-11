@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  listCrontab,
-  toggleCrontabEntry,
-  removeCrontabEntry,
-  type CronLine,
-} from "@/lib/api";
+import { listCrontab, toggleCrontabEntry, removeCrontabEntry, type CronLine } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Switch } from "@/components/ui/Switch";
@@ -59,11 +54,21 @@ export function CrontabPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">User Crontab</h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">
-            Entries from <code className="text-xs bg-[var(--surface-muted)] px-1.5 py-0.5 rounded">crontab -l</code>. Disabled entries are preserved as commented lines.
+            Entries from{" "}
+            <code className="text-xs bg-[var(--surface-muted)] px-1.5 py-0.5 rounded">
+              crontab -l
+            </code>
+            . Disabled entries are preserved as commented lines.
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" size="icon" onClick={refresh} disabled={loading} aria-label="Refresh">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={refresh}
+            disabled={loading}
+            aria-label="Refresh"
+          >
             <RefreshCw className={loading ? "animate-spin h-4 w-4" : "h-4 w-4"} />
           </Button>
           <Button variant="primary" disabled>
@@ -116,7 +121,12 @@ export function CrontabPage() {
                       <td className="px-4 py-3 font-mono text-xs">{line.schedule}</td>
                       <td className="px-4 py-3 font-mono text-xs break-all">{line.command}</td>
                       <td className="px-4 py-3 text-right">
-                        <Button variant="ghost" size="icon" onClick={() => onRemove(line)} aria-label="Remove">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onRemove(line)}
+                          aria-label="Remove"
+                        >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </td>

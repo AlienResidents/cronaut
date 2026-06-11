@@ -1,0 +1,17 @@
+# Cronaut — Rust build config
+#
+# Tauri's Linux build wants pkg-config to find dev headers shipped by
+# the apt packages libwebkit2gtk-4.1-dev, libsoup-3.0-dev, libatk1.0-dev,
+# libgtk-3-dev, libjavascriptcoregtk-4.1-dev, libayatana-appindicator3-dev.
+# Their .pc files land under /usr/lib/x86_64-linux-gnu/pkgconfig/.
+#
+# Whichever pkg-config is first on PATH (system /usr/bin/pkg-config OR a
+# Homebrew-installed one at /home/linuxbrew/.linuxbrew/bin/pkg-config) does
+# NOT include those system paths in its default search list. We extend the
+# search list here so either binary works without shell tweaks.
+#
+# `force = false` means a developer's own PKG_CONFIG_PATH wins — set yours
+# to include the same paths and ours becomes a no-op.
+
+[env]
+PKG_CONFIG_PATH = { value = "/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig:/usr/lib/pkgconfig", force = false }
