@@ -1,0 +1,65 @@
+# Logs / build artefacts
+*.log
+node_modules/
+dist/
+dist-ssr/
+build/
+
+# Tauri / Rust
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# Bundles / packaging
+*.deb
+*.AppImage
+*.rpm
+*.dmg
+*.msi
+*.exe
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE — keep .vscode/extensions.json if you add one, ignore the rest
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Secrets — defensive; this app never needs any
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.crt
+secrets.yaml
+secret.*.yaml
+.envrc
+
+# Local-only state
+*.local
+*.local.json
+.cache/
+
+# pnpm / node
+.pnpm-store/
+.pnpm-debug.log*
+npm-debug.log*
+yarn-debug.log*
+
+# Tooling state
+.tsbuildinfo
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+
+# Coverage
+coverage/
+
+# Worktrees (per Akuru convention; never check in)
+.agent/worktrees/
+.pi/worktrees/
+.worktrees/
+.claude/worktrees/

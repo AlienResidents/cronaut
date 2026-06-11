@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Cronaut",
+  "version": "0.1.0",
+  "identifier": "com.alienresidents.cronaut",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Cronaut",
+        "width": 1100,
+        "height": 720,
+        "minWidth": 880,
+        "minHeight": 560,
+        "resizable": true,
+        "decorations": true,
+        "transparent": false,
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' ipc: http://ipc.localhost; img-src 'self' data: asset: http://asset.localhost; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self'; connect-src 'self' ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["deb"],
+    "category": "Utility",
+    "shortDescription": "GUI for systemd timers and user cron",
+    "longDescription": "Cronaut is a modern desktop frontend for managing systemd --user timers and the current user's crontab on Debian-based Linux. It runs in the system tray, supports light/dark/system theming, and never makes network calls.",
+    "homepage": "https://github.com/alienresidents/cronaut",
+    "publisher": "AlienResidents",
+    "copyright": "Copyright © 2026 AlienResidents",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "linux": {
+      "deb": {
+        "depends": ["libwebkit2gtk-4.1-0", "libayatana-appindicator3-1 | libappindicator3-1", "cron"],
+        "section": "utils",
+        "priority": "optional"
+      }
+    }
+  }
+}

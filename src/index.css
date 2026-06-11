@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+/* ---- Cronaut theme tokens -----------------------------------------
+ *
+ * Light/dark/system + accent are switched at runtime by toggling
+ * the `.dark` class on <html> and the `data-accent` attribute. The
+ * values below are the defaults; SettingsPage.tsx writes user picks
+ * back into the document.
+ */
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Light surface */
+  --surface-bg: oklch(0.985 0.005 270);
+  --surface-card: oklch(1 0 0);
+  --surface-muted: oklch(0.96 0.005 270);
+  --surface-border: oklch(0.9 0.01 270);
+  --text-primary: oklch(0.18 0.02 270);
+  --text-muted: oklch(0.5 0.015 270);
+  --text-faint: oklch(0.65 0.01 270);
+
+  /* Default accent: violet */
+  --accent: oklch(0.62 0.21 295);
+  --accent-fg: oklch(0.99 0 0);
+  --accent-soft: oklch(0.95 0.05 295);
+  --accent-ring: oklch(0.62 0.21 295 / 0.35);
+
+  /* Status colours */
+  --success: oklch(0.7 0.16 150);
+  --warning: oklch(0.78 0.17 80);
+  --danger: oklch(0.62 0.22 25);
+}
+
+.dark {
+  --surface-bg: oklch(0.16 0.02 270);
+  --surface-card: oklch(0.2 0.02 270);
+  --surface-muted: oklch(0.24 0.02 270);
+  --surface-border: oklch(0.3 0.02 270);
+  --text-primary: oklch(0.97 0.005 270);
+  --text-muted: oklch(0.72 0.01 270);
+  --text-faint: oklch(0.55 0.01 270);
+
+  --accent: oklch(0.7 0.2 295);
+  --accent-fg: oklch(0.12 0.01 295);
+  --accent-soft: oklch(0.3 0.08 295);
+  --accent-ring: oklch(0.7 0.2 295 / 0.4);
+
+  --success: oklch(0.78 0.17 150);
+  --warning: oklch(0.83 0.17 80);
+  --danger: oklch(0.7 0.22 25);
+}
+
+[data-accent="indigo"] {
+  --accent: oklch(0.6 0.2 270);
+  --accent-soft: oklch(0.95 0.05 270);
+  --accent-ring: oklch(0.6 0.2 270 / 0.35);
+}
+[data-accent="violet"] {
+  --accent: oklch(0.62 0.21 295);
+  --accent-soft: oklch(0.95 0.05 295);
+  --accent-ring: oklch(0.62 0.21 295 / 0.35);
+}
+[data-accent="emerald"] {
+  --accent: oklch(0.65 0.18 155);
+  --accent-soft: oklch(0.95 0.05 155);
+  --accent-ring: oklch(0.65 0.18 155 / 0.35);
+}
+[data-accent="amber"] {
+  --accent: oklch(0.78 0.17 80);
+  --accent-soft: oklch(0.97 0.05 80);
+  --accent-ring: oklch(0.78 0.17 80 / 0.4);
+}
+[data-accent="rose"] {
+  --accent: oklch(0.66 0.22 15);
+  --accent-soft: oklch(0.95 0.05 15);
+  --accent-ring: oklch(0.66 0.22 15 / 0.35);
+}
+[data-accent="cyan"] {
+  --accent: oklch(0.7 0.15 215);
+  --accent-soft: oklch(0.95 0.05 215);
+  --accent-ring: oklch(0.7 0.15 215 / 0.35);
+}
+[data-accent="slate"] {
+  --accent: oklch(0.5 0.04 270);
+  --accent-soft: oklch(0.93 0.01 270);
+  --accent-ring: oklch(0.5 0.04 270 / 0.35);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--surface-bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* Scrollbar ----------------------------------------------------------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--surface-border);
+  border-radius: 999px;
+  border: 2px solid var(--surface-bg);
+}
