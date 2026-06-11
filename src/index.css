@@ -21,6 +21,8 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  color-scheme: light;
+
   /* Light surface */
   --surface-bg: oklch(0.985 0.005 270);
   --surface-card: oklch(1 0 0);
@@ -43,6 +45,8 @@
 }
 
 .dark {
+  color-scheme: dark;
+
   --surface-bg: oklch(0.16 0.02 270);
   --surface-card: oklch(0.2 0.02 270);
   --surface-muted: oklch(0.24 0.02 270);

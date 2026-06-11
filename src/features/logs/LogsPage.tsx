@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Switch } from "@/components/ui/Switch";
 import { Label } from "@/components/ui/Input";
-import { RefreshCw, AlertTriangle } from "lucide-react";
+import { RefreshCw, AlertTriangle, ChevronDown } from "lucide-react";
 
 type SourceKey = "user_cron" | string; // string = unit name
 
@@ -114,20 +114,23 @@ export function LogsPage() {
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-col gap-1.5 min-w-[280px]">
           <Label htmlFor="src">Source</Label>
-          <select
-            id="src"
-            className="h-9 rounded-md border border-[var(--surface-border)] bg-[var(--surface-card)] px-2 text-sm"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-            disabled={following}
-          >
-            <option value="user_cron">User cron (CRON syslog tag)</option>
-            {timers.map((t) => (
-              <option key={t.name} value={t.name}>
-                {t.name}.service
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              id="src"
+              className="appearance-none h-9 w-full rounded-md border border-[var(--surface-border)] bg-[var(--surface-card)] text-[var(--text-primary)] pl-3 pr-8 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)] disabled:cursor-not-allowed disabled:opacity-50"
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              disabled={following}
+            >
+              <option value="user_cron">User cron (CRON syslog tag)</option>
+              {timers.map((t) => (
+                <option key={t.name} value={t.name}>
+                  {t.name}.service
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <Switch checked={following} onCheckedChange={(v) => (v ? startFollow() : stopFollow())} />
