@@ -6,6 +6,11 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-06-12
+
+First alpha. Functional scaffold; create/edit forms for timers and crontab
+entries are not yet implemented.
+
 ### Added
 - Initial scaffold (Tauri 2 + React 19 + Tailwind 4)
 - Systemd `--user` timer listing, enable/disable, run-now, remove
